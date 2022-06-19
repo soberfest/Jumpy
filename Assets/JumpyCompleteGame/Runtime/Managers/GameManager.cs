@@ -11,33 +11,23 @@ namespace Jumpy
         /// <summary>
         /// A reference to all the important game properties should be put here
         /// </summary>
-        private GameProgressManager gameStatus;
-        public GameProgressManager GameStatus
-        {
-            get
-            {
-                if (gameStatus == null)
-                {
-                    gameStatus = new GameProgressManager();
-                }
-                return gameStatus;
-            }
-        }
+        private GameProgressManager _gameStatus;
+        public GameProgressManager GameStatus => _gameStatus ??= new GameProgressManager();
 
 
         /// <summary>
         /// A reference of UI loader script to be used from entire game
         /// </summary>
-        private AssetsLoaderManager assetsLoader;
+        private AssetsLoaderManager _assetsLoader;
         public AssetsLoaderManager AssetsLoader
         {
             get
             {
-                if (assetsLoader == null)
+                if (_assetsLoader == null)
                 {
-                    assetsLoader = gameObject.AddComponent<AssetsLoaderManager>();
+                    _assetsLoader = gameObject.AddComponent<AssetsLoaderManager>();
                 }
-                return assetsLoader;
+                return _assetsLoader;
             }
         }
 
@@ -45,29 +35,29 @@ namespace Jumpy
         /// <summary>
         /// A reference of sound loader script to be used from the entire game
         /// </summary>
-        SoundLoaderManager soundLoader;
+        private SoundLoaderManager _soundLoader;
         public SoundLoaderManager SoundLoader
         {
             get
             {
-                if (soundLoader == null)
+                if (_soundLoader == null)
                 {
-                    soundLoader = gameObject.AddComponent<SoundLoaderManager>();
+                    _soundLoader = gameObject.AddComponent<SoundLoaderManager>();
                 }
-                return soundLoader;
+                return _soundLoader;
             }
         }
 
-        TweenManager tweenManager;
+        private TweenManager _tweenManager;
         public TweenManager Tween
         {
             get
             {
-                if(tweenManager == null)
+                if(_tweenManager == null)
                 {
-                    tweenManager = gameObject.AddComponent<TweenManager>();
+                    _tweenManager = gameObject.AddComponent<TweenManager>();
                 }
-                return tweenManager;
+                return _tweenManager;
             }
         }
 

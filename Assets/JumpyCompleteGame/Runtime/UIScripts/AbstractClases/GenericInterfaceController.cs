@@ -105,7 +105,7 @@ namespace Jumpy
             DisableButtons();
             if (popUpIsActive == false)
             {
-                AssetsLoaderManager.onPopupWasClosed += PopupWasClosed;
+                AssetsLoaderManager.OnPopupWasClosed += PopupWasClosed;
                 popUpIsActive = true;
             }
         }
@@ -117,7 +117,7 @@ namespace Jumpy
         /// <param name="name">the name of the closed popup</param>
         public virtual void PopupWasClosed(string name)
         {
-            AssetsLoaderManager.onPopupWasClosed -= PopupWasClosed;
+            AssetsLoaderManager.OnPopupWasClosed -= PopupWasClosed;
             popUpIsActive = false;
             EnableButtons();
         }
@@ -174,7 +174,7 @@ namespace Jumpy
         /// </summary>
         public virtual void OnDestroy()
         {
-            AssetsLoaderManager.onPopupWasClosed -= PopupWasClosed;
+            AssetsLoaderManager.OnPopupWasClosed -= PopupWasClosed;
             popUpIsActive = false;
             DisableButtons();
         }

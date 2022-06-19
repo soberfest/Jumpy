@@ -5,11 +5,11 @@ using GleyAllPlatformsSave;
 using UnityEngine;
 /// <summary>
 /// Version 1.0.3
-/// 
+///
 /// Serializes any type of serializable class to a byte array which is then encrypted and saved to PlayerPrefs of to a file depending on your settings
-/// 
+///
 /// For a detailed usage example see the TestSave.cs
-/// 
+///
 /// </summary>
 using UnityEngine.Events;
 
@@ -17,44 +17,44 @@ using UnityEngine.Events;
 
 public class SaveManager
 {
-    static ISaveClass saveMethod;
+	private static ISaveClass _saveMethod;
 
 
 #if JSONSerializationGooglePlaySave
     static ISaveClass cloudSaveMethod;
 #endif
 
-    static SaveManager instance;
+	private static SaveManager _instance;
     public static SaveManager Instance
     {
         get
         {
-            if (instance == null)
+            if (_instance == null)
             {
-                instance = new SaveManager();
+                _instance = new SaveManager();
                 AddRequiredScript();
             }
 
-            return instance;
+            return _instance;
         }
     }
 
-    static void AddRequiredScript()
+    private static void AddRequiredScript()
     {
 #if JSONSerializationFileSave
-        saveMethod = new JSONSerializationFileSave();
+    _saveMethod = new JSONSerializationFileSave();
 #endif
 
 #if JSONSerializationPlayerPrefs
-    saveMethod = new JSONSerializationPlayerPrefs();
+    _saveMethod = new JSONSerializationPlayerPrefs();
 #endif
 
 #if BinarySerializationFileSave
-    saveMethod = new BinarySerializationFileSave();
+    _saveMethod = new BinarySerializationFileSave();
 #endif
 
 #if BinarySerializationPlayerPrefs
-    saveMethod = new BinarySerializationPlayerPrefs();
+    _saveMethod = new BinarySerializationPlayerPrefs();
 #endif
     }
 
@@ -65,10 +65,10 @@ public class SaveManager
     /// <param name="dataToSave">Any type of serializable class</param>
     /// <param name="path">File name path.</param>
     /// <param name="encrypt">If set to <c>true</c> encrypt.</param>
-    /// <param name="CompleteMethod">Called after all is done</param>
-    public void Save<T>(T dataToSave, string path, UnityAction<SaveResult, string> CompleteMethod, bool encrypted) where T : class, new()
+    /// <param name="completeMethod">Called after all is done</param>
+    public void Save<T>(T dataToSave, string path, UnityAction<SaveResult, string> completeMethod, bool encrypted) where T : class, new()
     {
-        if (saveMethod == null)
+        if (_saveMethod == null)
         {
 #if UNITY_EDITOR
             Debug.LogError("Current platform (" + UnityEditor.EditorUserBuildSettings.activeBuildTarget + ") is not added to plugin settings. Go to Window->Gley->Save and add your current platform");
@@ -77,12 +77,12 @@ public class SaveManager
 #endif
             return;
         }
-        saveMethod.Save<T>(dataToSave, path, CompleteMethod, encrypted);
+        _saveMethod.Save<T>(dataToSave, path, completeMethod, encrypted);
     }
 
-    public void SaveString<T>(T dataToSave, UnityAction<SaveResult, string> CompleteMethod, bool encrypted) where T : class, new()
+    public void SaveString<T>(T dataToSave, UnityAction<SaveResult, string> completeMethod, bool encrypted) where T : class, new()
     {
-        saveMethod.SaveString<T>(dataToSave, CompleteMethod, encrypted);
+        _saveMethod.SaveString<T>(dataToSave, completeMethod, encrypted);
     }
 
     /// <summary>
@@ -91,11 +91,11 @@ public class SaveManager
     /// If specified file does not exists, a new one is generated and the defauld values from serializeable class are saved 
     /// </summary>
     /// <param name="path">File name.</param>
-    /// <param name="CompleteMethod">Called after all is done</param>
+    /// <param name="completeMethod">Called after all is done</param>
     /// <param name="encrypted">If set to <c>true</c> encrypted.</param>
-    public void Load<T>(string path, UnityAction<T, SaveResult, string> CompleteMethod, bool encrypted) where T : class, new()
+    public void Load<T>(string path, UnityAction<T, SaveResult, string> completeMethod, bool encrypted) where T : class, new()
     {
-        if (saveMethod == null)
+        if (_saveMethod == null)
         {
 #if UNITY_EDITOR
             Debug.LogError("Current platform (" + UnityEditor.EditorUserBuildSettings.activeBuildTarget + ") is not added to plugin settings. Go to Window->Gley->Save and add your current platform");
@@ -104,16 +104,16 @@ public class SaveManager
 #endif
             return;
         }
-        saveMethod.Load<T>(path, CompleteMethod, encrypted);
+        _saveMethod.Load<T>(path, completeMethod, encrypted);
     }
-    public void LoadString<T>(string stringToLoad, UnityAction<T, SaveResult, string> LoadCompleteMethod, bool encrypted) where T : class, new()
+    public void LoadString<T>(string stringToLoad, UnityAction<T, SaveResult, string> loadCompleteMethod, bool encrypted) where T : class, new()
     {
-        saveMethod.LoadString<T>(stringToLoad, LoadCompleteMethod, encrypted);
+        _saveMethod.LoadString<T>(stringToLoad, loadCompleteMethod, encrypted);
     }
 
         public void ClearAllData(string path)
     {
-        if (saveMethod == null)
+        if (_saveMethod == null)
         {
 #if UNITY_EDITOR
             Debug.LogError("Current platform (" + UnityEditor.EditorUserBuildSettings.activeBuildTarget + ") is not added to plugin settings. Go to Window->Gley->Save and add your current platform");
@@ -122,19 +122,17 @@ public class SaveManager
 #endif
             return;
         }
-        saveMethod.ClearAllData(path);
+        _saveMethod.ClearAllData(path);
     }
 
 
     public void ClearFIle(string path)
     {
-        if (saveMethod == null)
+        if (_saveMethod == null)
         {
             Debug.LogError("Current platform is not added to plugin settings. Go to Window->Gley->Save and add your current platform");
             return;
         }
-        saveMethod.ClearFile(path);
+        _saveMethod.ClearFile(path);
     }
 }
-
-
