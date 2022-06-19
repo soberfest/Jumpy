@@ -10,82 +10,83 @@
 
     public class SaveSettingsWindow : EditorWindow
     {
-        SaveSettings saveSettings;
-        List<SupportedBuildTargetGroup> buildTargetGroup;
-        List<SupportedSaveMethods> selectedSaveMethod;
-        string message;
+	    private SaveSettings _saveSettings;
+	    private List<SupportedBuildTargetGroup> _buildTargetGroup;
+	    private List<SupportedSaveMethods> _selectedSaveMethod;
+
+	    private string _message;
         // Get existing open window or if none, make a new one:
         [MenuItem("Window/Gley/All Platforms Save", false, 10)]
-        static void Init()
+        private static void Init()
         {
-            string path = "Assets//GleyPlugins/AllPlatformsSave/Scripts/Version.txt";
-            StreamReader reader = new StreamReader(path);
-            // string longVersion = JsonUtility.FromJson<Gley.About.AssetVersion>(reader.ReadToEnd()).longVersion;
-
-            SaveSettingsWindow window = (SaveSettingsWindow)GetWindow(typeof(SaveSettingsWindow));
-            // window.titleContent = new GUIContent("Save - v." + longVersion);
+            string path = "Assets/AllPlatformsSave/Scripts/Version.txt";
+            var reader = new StreamReader(path);
+            var window = (SaveSettingsWindow)GetWindow(typeof(SaveSettingsWindow));
+            string longVersion = JsonUtility.FromJson<Gley.About.AssetVersion>(reader.ReadToEnd()).longVersion;
+            window.titleContent = new GUIContent("Save - v." + longVersion);
             window.minSize = new Vector2(520, 520);
             window.Show();
         }
 
         private void OnEnable()
         {
-            saveSettings = Resources.Load<SaveSettings>("SaveSettingsData");
-            if (saveSettings == null)
+            _saveSettings = Resources.Load<SaveSettings>("SaveSettingsData");
+            if (_saveSettings == null)
             {
                 CreateAdSettings();
-                saveSettings = Resources.Load<SaveSettings>("SaveSettingsData");
+                _saveSettings = Resources.Load<SaveSettings>("SaveSettingsData");
             }
-            selectedSaveMethod = saveSettings.saveMethod;
-            buildTargetGroup = saveSettings.buildTargetGroup;
+            _selectedSaveMethod = _saveSettings.saveMethod;
+            _buildTargetGroup = _saveSettings.buildTargetGroup;
         }
 
         public static void CreateAdSettings()
         {
-            SaveSettings asset = ScriptableObject.CreateInstance<SaveSettings>();
-            if (!AssetDatabase.IsValidFolder("Assets/GleyPlugins/AllPlatformsSave/Resources"))
+            var asset = CreateInstance<SaveSettings>();
+            if (!AssetDatabase.IsValidFolder("Assets/AllPlatformsSave/Resources"))
             {
-                AssetDatabase.CreateFolder("Assets/GleyPlugins/AllPlatformsSave", "Resources");
+                AssetDatabase.CreateFolder("Assets/AllPlatformsSave", "Resources");
                 AssetDatabase.Refresh();
             }
 
-            AssetDatabase.CreateAsset(asset, "Assets/GleyPlugins/AllPlatformsSave/Resources/SaveSettingsData.asset");
+            AssetDatabase.CreateAsset(asset, "Assets/AllPlatformsSave/Resources/SaveSettingsData.asset");
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
-        void OnGUI()
+
+        private void OnGUI()
         {
             GUILayout.Label("Configure your save plugin from here: ", EditorStyles.boldLabel);
 
             EditorGUILayout.Space();
-            for (int i = 0; i < buildTargetGroup.Count; i++)
+            for (int i = 0; i < _buildTargetGroup.Count; i++)
             {
-                buildTargetGroup[i] = (SupportedBuildTargetGroup)EditorGUILayout.EnumPopup("Select your build target:", buildTargetGroup[i]);
-                selectedSaveMethod[i] = (SupportedSaveMethods)EditorGUILayout.EnumPopup("Select save method:", selectedSaveMethod[i]);
+                _buildTargetGroup[i] = (SupportedBuildTargetGroup)EditorGUILayout.EnumPopup("Select your build target:", _buildTargetGroup[i]);
+                _selectedSaveMethod[i] = (SupportedSaveMethods)EditorGUILayout.EnumPopup("Select save method:", _selectedSaveMethod[i]);
                 if (GUILayout.Button("Remove Build Target"))
                 {
-                    buildTargetGroup.RemoveAt(i);
-                    selectedSaveMethod.RemoveAt(i);
+                    _buildTargetGroup.RemoveAt(i);
+                    _selectedSaveMethod.RemoveAt(i);
                 }
                 EditorGUILayout.Space();
                 EditorGUILayout.Space();
             }
             if (GUILayout.Button("Add Build Target"))
             {
-                buildTargetGroup.Add(SupportedBuildTargetGroup.Android);
-                selectedSaveMethod.Add(SupportedSaveMethods.JSONSerializationFileSave);
+                _buildTargetGroup.Add(SupportedBuildTargetGroup.Android);
+                _selectedSaveMethod.Add(SupportedSaveMethods.JSONSerializationFileSave);
             }
 
             EditorGUILayout.Space();
             if (GUILayout.Button("Save"))
             {
-                for (int i = 0; i < buildTargetGroup.Count - 1; i++)
+                for (int i = 0; i < _buildTargetGroup.Count - 1; i++)
                 {
-                    for (int j = i + 1; j < buildTargetGroup.Count; j++)
+                    for (int j = i + 1; j < _buildTargetGroup.Count; j++)
                     {
-                        if (buildTargetGroup[i] == buildTargetGroup[j])
+                        if (_buildTargetGroup[i] == _buildTargetGroup[j])
                         {
-                            message = "Platform " + buildTargetGroup[i] + " exists multiple times. \nRemove duplicate entries and save again";
+                            _message = "Platform " + _buildTargetGroup[i] + " exists multiple times. \nRemove duplicate entries and save again";
                             return;
                         }
                     }
@@ -101,35 +102,39 @@
                         {
                             AddPreprocessorDirective(saveMethods.GetValue(j).ToString(), true, (BuildTargetGroup)buildTargetGroups.GetValue(i));
                         }
-                        catch { }
+                        catch (Exception e)
+						{
+							_message = "Error while adding preprocessor directive: " + e.Message;
+							return;
+						}
                     }
                 }
 
-                for (int i = 0; i < buildTargetGroup.Count; i++)
+                for (int i = 0; i < _buildTargetGroup.Count; i++)
                 {
-                    AddPreprocessorDirective(selectedSaveMethod[i].ToString(), false, (BuildTargetGroup)buildTargetGroup[i]);
+                    AddPreprocessorDirective(_selectedSaveMethod[i].ToString(), false, (BuildTargetGroup)_buildTargetGroup[i]);
                 }
 
                 SaveSettings();
-                message = "Settings applied.";
+                _message = "Settings applied.";
             }
-            GUILayout.Label(message, EditorStyles.boldLabel);
+            GUILayout.Label(_message, EditorStyles.boldLabel);
 
             EditorGUILayout.Space();
             if (GUILayout.Button("Open Test Scene"))
             {
-                EditorSceneManager.OpenScene("Assets/GleyPlugins/AllPlatformsSave/Example/Scenes/SimpleSaveExample.unity");
+                EditorSceneManager.OpenScene("Assets/AllPlatformsSave/Example/Scenes/SimpleSaveExample.unity");
             }
         }
 
         private void SaveSettings()
         {
-            saveSettings.saveMethod = selectedSaveMethod;
-            saveSettings.buildTargetGroup = buildTargetGroup;
-            EditorUtility.SetDirty(saveSettings);
+            _saveSettings.saveMethod = _selectedSaveMethod;
+            _saveSettings.buildTargetGroup = _buildTargetGroup;
+            EditorUtility.SetDirty(_saveSettings);
         }
 
-        void AddPreprocessorDirective(string directive, bool remove, BuildTargetGroup target)
+        private void AddPreprocessorDirective(string directive, bool remove, BuildTargetGroup target)
         {
             string textToWrite = PlayerSettings.GetScriptingDefineSymbolsForGroup(target);
 
