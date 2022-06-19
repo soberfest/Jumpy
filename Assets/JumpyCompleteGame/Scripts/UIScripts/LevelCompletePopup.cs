@@ -10,13 +10,7 @@
     {
         public Text scoreText;
         public Text highScoreText;
-        private int highScore;
-
-        public Text titleText;
-        public Text submitText;
-        public Text restartText;
-        public Text removeAdsText1;
-        public Text removeAdsText2;
+        private int _highScore;
 
         /// <summary>
         /// Called every time a popup is opened
@@ -26,29 +20,17 @@
             base.Initialize();
 
             //check if the new score is a highScore
-            highScore = GameStatus.SetHighScore(InGameInterface.currentDistance);
+            _highScore = GameStatus.SetHighScore(InGameInterface.currentDistance);
 
             //if it is a highScore play a sound with a 0.5 seconds delay
-            if (highScore == InGameInterface.currentDistance)
+            if (_highScore == InGameInterface.currentDistance)
             {
                 Invoke("NewHighscore", 0.5f);
             }
 
             //update popup texts
-#if ENABLE_JUMPY
-            /*
-             scoreText.text =  GleyLocalization.Manager.GetText(WordIDs.ScoreID)+": " + InGameInterface.currentDistance;
-            highScoreText.text = GleyLocalization.Manager.GetText(WordIDs.HighscoreID) +": " + highScore;
-            titleText.text = GleyLocalization.Manager.GetText(WordIDs.LevelCompleteID);
-            submitText.text = GleyLocalization.Manager.GetText(WordIDs.SubmitID);
-            restartText.text = GleyLocalization.Manager.GetText(WordIDs.RestartID);
-            removeAdsText1.text = GleyLocalization.Manager.GetText(WordIDs.RemoveID);
-            removeAdsText2.text = GleyLocalization.Manager.GetText(WordIDs.AdsID);
-            */
-#else
             scoreText.text = "Score: " + InGameInterface.currentDistance;
-            highScoreText.text = "HighScore: " + highScore;
-#endif
+            highScoreText.text = "HighScore: " + _highScore;
         }
 
 
@@ -64,36 +46,10 @@
         public override void PerformClickActionsPopup(GameObject button)
         {
             base.PerformClickActionsPopup(button);
-            if (button.name == "SubmitButton")
-            {
-                //submit the highScore
-#if ENABLE_JUMPY0
-                GameServices.Instance.SubmitScore(highScore, LeaderboardNames.HighestJumpers);
-#endif
-            }
 
             if (button.name == "RestartButton")
             {
                 ClosePopup(true, () => LevelManager.Instance.RestartLevel());
-            }
-#if ENABLE_JUMPY0
-            if(button.name == "RemoveAdsButton")
-            {
-                //disable the buttons
-                DisablePopup();
-                //remove ads
-                IAPManager.Instance.BuyProduct(ShopProductNames.RemoveAds, BuyComplete);
-            }
-#endif
-
-            if (button.name == "LeaderboardButton")
-            {
-                // GameServices.Instance.ShowLeaderboadsUI();
-            }
-
-            if (button.name == "AchievementsButton")
-            {
-                // GameServices.Instance.ShowAchievementsUI();
             }
         }
     }
