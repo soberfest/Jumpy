@@ -275,7 +275,7 @@
         /// Called by InGameInterface when user released a button
         /// </summary>
         /// <param name="pressTime">total press time</param>
-        internal void ButtonReleased(float pressTime)
+        public void ButtonReleased(float pressTime)
         {
             //make player jump based on press time
             playerScript.Jump(pressTime, bottomRightPoz, bottomLeftPoz);
