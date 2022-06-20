@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using Jumpy;
 using NUnit.Framework;
 using UnityEngine;
@@ -8,9 +7,6 @@ using UnityEngine.TestTools;
 
 public class TestScripts
 {
-	private GameObject _game;
-	private List<GameObject> _instances = new List<GameObject>();
-
 	[UnitySetUp]
 	public IEnumerator Setup()
 	{
@@ -18,21 +14,11 @@ public class TestScripts
 
 		yield return null;
 		yield return null;
-
-		// _instances.Add(Object.Instantiate(Resources.Load<GameObject>("Prefabs/Main Camera")));
-		// _instances.Add(Object.Instantiate(Resources.Load<GameObject>("Prefabs/MainCanvas")));
-		// _instances.Add(Object.Instantiate(Resources.Load<GameObject>("Prefabs/PopupCanvas")));
-		// _instances.Add(Object.Instantiate(Resources.Load<GameObject>("Prefabs/EventSystem")));
-		// _instances.Add(Object.Instantiate(Resources.Load<GameObject>("Prefabs/LevelObjects")));
 	}
 
 	[TearDown]
 	public void Teardown()
 	{
-		foreach (var o in _instances)
-		{
-			Object.Destroy(o);
-		}
 	}
 
     [Test]
@@ -67,7 +53,38 @@ public class TestScripts
 	    Time.timeScale = 1f;
 
 	    var inGameInterface = Object.FindObjectOfType<InGameInterface>(true);
-	    Assert.IsNotNull(inGameInterface);
-	    Assert.IsTrue(inGameInterface.gameObject.activeSelf);
+	    Assert.IsNotNull(inGameInterface, "InGameInterface not found");
+	    Assert.IsTrue(inGameInterface.gameObject.activeSelf, "InGameInterface not active");
+    }
+
+    [UnityTest]
+    public IEnumerator CheckIfPlayerMoves()
+    {
+	    Time.timeScale = 20.0f;
+	    var titleScreen = Object.FindObjectOfType<TitleScreenPopup>();
+	    Assert.IsNotNull(titleScreen, "TitleScreenPopup not found");
+
+	    var startButton = GameObject.Find("PlayButton");
+	    Assert.IsNotNull(startButton);
+
+	    titleScreen.PerformClickActionsPopup(startButton);
+
+	    float time = 0f;
+	    while (time < 5f)
+	    {
+		    time += Time.fixedDeltaTime;
+		    yield return new WaitForFixedUpdate();
+	    }
+
+	    Time.timeScale = 1f;
+
+	    var player = Object.FindObjectOfType<Player>();
+	    Assert.IsNotNull(player, "Player not found");
+	    var transformYPosBefore = player.transform.position.y;
+
+	    LevelManager.Instance.ButtonReleased(1.0f);
+	    yield return new WaitForFixedUpdate();
+	    yield return new WaitForFixedUpdate();
+	    Assert.Greater(player.transform.position.y, transformYPosBefore, "Player did not move");
     }
 }
