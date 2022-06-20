@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/GleyPlugins/JumpyCompleteGame/Scenes/Game.unity
+    path: Assets/Scenes/Game.unity
     guid: 8dd02b18e3c333a479f6a4696faac51b
   m_configObjects: {}
