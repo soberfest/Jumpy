@@ -1,16 +1,17 @@
-{
-    "name": "GameAssembly",
-    "rootNamespace": "",
+﻿{
+    "name": "Unity.Recorder.Samples.Editor",
     "references": [
-        "GUID:1884b14b40ed54baba7ff6caf6a74683"
+        "Unity.Recorder.Editor"
     ],
-    "includePlatforms": [],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+    "versionDefines": []
 }
