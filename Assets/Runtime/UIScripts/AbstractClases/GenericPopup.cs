@@ -156,7 +156,7 @@ namespace Jumpy
         /// <summary>
         /// Called to close this popup
         /// </summary>
-        /// <param name="enableInterface">he interface from which the current popup was opened</param>
+        /// <param name="enableInterface">The interface from which the current popup was opened</param>
         /// <param name="actionWhenPopupCLoses">an Unity action that is triggered after the current popup is closed</param>
         public virtual void ClosePopup(bool enableInterface = true, UnityAction actionWhenPopupCLoses = null)
         {

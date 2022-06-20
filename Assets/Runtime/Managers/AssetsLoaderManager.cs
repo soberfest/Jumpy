@@ -10,7 +10,7 @@ namespace Jumpy
         InGameInterface
     }
 
-    //all pupup UI from the game
+    //all popup UI from the game
     public enum GamePopups
     {
         TitleScreenPopup,

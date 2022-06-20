@@ -5,30 +5,30 @@
 
     public class LevelManager : SingleReference<LevelManager>
     {
-        private readonly int countTo = 4; // the length of the start counter     
+	    private const int CountTo = 4; // the length of the start counter
 
-        #region GameVariables
-        private float cornDistance = 25; // distance at which a power up appears
+	    #region GameVariables
+        private float _cornDistance = 25; // distance at which a power up appears
 
-        private Camera mainCamera;
-        private GameObject playerStartPoz;
-        private GameObject player;
-        private InGameInterface inGameInterface;
-        private Player playerScript;
-        private Corn cornScript;
-        private Cylinder cylinderScript;
-        private LevelBuilder levelBuilder;
-        private LevelObstacles levelObstacles;
+        private Camera _mainCamera;
+        private GameObject _playerStartPoz;
+        private GameObject _player;
+        private InGameInterface _inGameInterface;
+        private Player _playerScript;
+        private Corn _cornScript;
+        private Cylinder _cylinderScript;
+        private LevelBuilder _levelBuilder;
+        private LevelObstacles _levelObstacles;
 
-        private int counter;
-        private bool idleAnimation;
+        private int _counter;
+        private bool _idleAnimation;
 
-        private bool cameraFollow;
-        private bool levelStarted;
-        private bool levelComplete;
-        private Transform yPozObstacle;
-        private Transform bottomLeftPoz;
-        private Transform bottomRightPoz;
+        private bool _cameraFollow;
+        private bool _levelStarted;
+        private bool _levelComplete;
+        private Transform _yPozObstacle;
+        private Transform _bottomLeftPoz;
+        private Transform _bottomRightPoz;
         #endregion
 
 
@@ -37,7 +37,7 @@
         private void Start()
         {
             //make game camera reference
-            mainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
+            _mainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
 
             //load all level features
             ConstructLevel();
@@ -55,8 +55,8 @@
             LoadObstacles();
 
             //start idle animations
-            idleAnimation = true;
-            cameraFollow = true;
+            _idleAnimation = true;
+            _cameraFollow = true;
 
         }
 
@@ -64,32 +64,32 @@
         private void Update()
         {
             //move the background without starting the level
-            if (idleAnimation)
+            if (_idleAnimation)
             {
                 MakeIdleAnimation();
             }
 
             //follow the player with main camera
-            if (cameraFollow)
+            if (_cameraFollow)
             {
                 FollowPlayer();
             }
 
             //level is in progress
-            if (levelStarted)
+            if (_levelStarted)
             {
                 //generate corn when a certain distance is reached
-                if (yPozObstacle.position.y > cornDistance)
+                if (_yPozObstacle.position.y > _cornDistance)
                 {
-                    cornDistance += cornDistance;
+                    _cornDistance += _cornDistance;
                     ShowCorn();
                 }
 
                 //update level obstacles
-                levelObstacles.UpdateObstacles();
+                _levelObstacles.UpdateObstacles();
 
                 //check if bottom cylinder touched the player
-                if (cylinderScript.CheckForDeath())
+                if (_cylinderScript.CheckForDeath())
                 {
                     GameManager.instance.SoundLoader.AddFxSound("Death(cylinder)");
                     LevelComplete();
@@ -109,36 +109,36 @@
             ResetVars();
 
             //reset vars
-            levelComplete = false;
-            idleAnimation = false;
-            cameraFollow = false;
+            _levelComplete = false;
+            _idleAnimation = false;
+            _cameraFollow = false;
 
-            counter = countTo;
+            _counter = CountTo;
 
             //reset player
-            playerScript.ResetPlayer();
-            player.transform.position = playerStartPoz.transform.position;
+            _playerScript.ResetPlayer();
+            _player.transform.position = _playerStartPoz.transform.position;
 
             //reset corn
-            cornScript.ResetCornPosition();
+            _cornScript.ResetCornPosition();
 
             //reset camera with animation
-            mainCamera.transform.position = new Vector3(0, 3, -10);
-
-            GameManager.Instance.Tween.MoveTo(mainCamera.transform, 0, 0, -100, 0.4f, StartFollowingPlayer);
+            var transform1 = _mainCamera.transform;
+            transform1.position = new Vector3(0, 3, -10);
+            GameManager.Instance.Tween.MoveTo(transform1, 0, 0, -100, 0.4f, StartFollowingPlayer);
 
             //reset bottom cylinder
-            cylinderScript.ResetPosition();
+            _cylinderScript.ResetPosition();
 
             //reset bg animations
-            levelBuilder.ResetBG();
+            _levelBuilder.ResetBG();
 
             //reset obstacles position
-            levelObstacles.ResetObstacles();
+            _levelObstacles.ResetObstacles();
 
             //reset interface
-            inGameInterface = GameManager.instance.AssetsLoader.GetCurrentInterface().GetComponent<InGameInterface>();
-            inGameInterface.RestartLevel();
+            _inGameInterface = GameManager.instance.AssetsLoader.GetCurrentInterface().GetComponent<InGameInterface>();
+            _inGameInterface.RestartLevel();
         }
 
 
@@ -147,12 +147,12 @@
         /// </summary>
         private void ConstructLevel()
         {
-            levelBuilder = gameObject.AddComponent<LevelBuilder>();
-            levelBuilder.ConstructLevel(mainCamera);
+            _levelBuilder = gameObject.AddComponent<LevelBuilder>();
+            _levelBuilder.ConstructLevel(_mainCamera);
 
             //make screen edge references          
-            bottomLeftPoz = levelBuilder.GetBottomLeftPoz();
-            bottomRightPoz = levelBuilder.GetBottomRightPoz();
+            _bottomLeftPoz = _levelBuilder.GetBottomLeftPoz();
+            _bottomRightPoz = _levelBuilder.GetBottomRightPoz();
         }
 
 
@@ -161,9 +161,9 @@
         /// </summary>
         private void LoadObstacles()
         {
-            levelObstacles = gameObject.AddComponent<LevelObstacles>();
-            levelObstacles.LoadObstacles(bottomLeftPoz, bottomRightPoz, mainCamera);
-            yPozObstacle = levelObstacles.GetYPozObstacle();
+            _levelObstacles = gameObject.AddComponent<LevelObstacles>();
+            _levelObstacles.LoadObstacles(_bottomLeftPoz, _bottomRightPoz, _mainCamera);
+            _yPozObstacle = _levelObstacles.GetYPozObstacle();
         }
 
         /// <summary>
@@ -171,11 +171,11 @@
         /// </summary>
         private void LoadCylinder()
         {
-            GameObject cylinder = Instantiate(Resources.Load<GameObject>("Level/Roll"));
-            cylinderScript = cylinder.AddComponent<Cylinder>();
-            cylinderScript.Follow(false);
-            cylinderScript.SetPlayer(player.transform);
-            cylinderScript.ResetPosition();
+            var cylinder = Instantiate(Resources.Load<GameObject>("Level/Roll"));
+            _cylinderScript = cylinder.AddComponent<Cylinder>();
+            _cylinderScript.Follow(false);
+            _cylinderScript.SetPlayer(_player.transform);
+            _cylinderScript.ResetPosition();
         }
 
 
@@ -184,8 +184,8 @@
         /// </summary>
         private void LoadCorn()
         {
-            GameObject corn = Instantiate(Resources.Load<GameObject>("Level/Corn"));
-            cornScript = corn.GetComponent<Corn>();
+            var corn = Instantiate(Resources.Load<GameObject>("Level/Corn"));
+            _cornScript = corn.GetComponent<Corn>();
         }
 
         /// <summary>
@@ -193,7 +193,7 @@
         /// </summary>
         private void StartFollowingPlayer()
         {
-            cameraFollow = true;
+            _cameraFollow = true;
         }
 
 
@@ -203,9 +203,9 @@
         private void ResetVars()
         {
             GameManager.instance.Tween.StopAllTweens();
-            playerScript.Slide(false);
-            cylinderScript.Follow(false);
-            levelStarted = false;
+            _playerScript.Slide(false);
+            _cylinderScript.Follow(false);
+            _levelStarted = false;
         }
 
 
@@ -215,11 +215,11 @@
         /// </summary>
         private void StartLevel()
         {
-            cylinderScript.Follow(true);
-            levelObstacles.AddObstacles();
-            playerScript.Slide(true);
-            inGameInterface.ShowCounter(false);
-            levelStarted = true;
+            _cylinderScript.Follow(true);
+            _levelObstacles.AddObstacles();
+            _playerScript.Slide(true);
+            _inGameInterface.ShowCounter(false);
+            _levelStarted = true;
         }
 
 
@@ -228,12 +228,12 @@
         /// </summary>
         public void LevelComplete()
         {
-            if (levelComplete == false)
+            if (_levelComplete == false)
             {
                 ResetVars();
 
-                levelComplete = true;
-                playerScript.DeathAnimation();
+                _levelComplete = true;
+                _playerScript.DeathAnimation();
 
                 Invoke("LoadCompletepopup", 1);
             }
@@ -245,7 +245,7 @@
         /// </summary>
         private void LoadCompletepopup()
         {
-            inGameInterface.LevelComplete();
+            _inGameInterface.LevelComplete();
         }
         #endregion
 
@@ -257,7 +257,7 @@
         /// </summary>
         internal void ButtonPressed()
         {
-            playerScript.PrepareToJump();
+            _playerScript.PrepareToJump();
         }
 
 
@@ -267,7 +267,7 @@
         /// <param name="pressTime"></param>
         internal void ScaleHold(float pressTime)
         {
-            playerScript.ScaleChicken(pressTime);
+            _playerScript.ScaleChicken(pressTime);
         }
 
 
@@ -278,7 +278,7 @@
         internal void ButtonReleased(float pressTime)
         {
             //make player jump based on press time
-            playerScript.Jump(pressTime, bottomRightPoz, bottomLeftPoz);
+            _playerScript.Jump(pressTime, _bottomRightPoz, _bottomLeftPoz);
         }
 
 
@@ -288,23 +288,23 @@
         internal void JumpComplete()
         {
             //updates start counter
-            counter--;
-            if (counter >= 0)
+            _counter--;
+            if (_counter >= 0)
             {
-                if (counter == 0)
+                if (_counter == 0)
                 {
                     StartLevel();
                 }
-                inGameInterface.UpdateCounter(counter.ToString());
+                _inGameInterface.UpdateCounter(_counter.ToString());
             }
             else
             {
-                playerScript.Slide(true);
+                _playerScript.Slide(true);
             }
 
             //update in game interface
-            inGameInterface.EnableGameplayButton();
-            inGameInterface.UpdateDistance(((int)mainCamera.transform.position.y));
+            _inGameInterface.EnableGameplayButton();
+            _inGameInterface.UpdateDistance(((int)_mainCamera.transform.position.y));
         }
         #endregion
 
@@ -316,7 +316,7 @@
         /// </summary>
         private void MakeIdleAnimation()
         {
-            player.transform.Translate(0, Time.deltaTime, 0);
+            _player.transform.Translate(0, Time.deltaTime, 0);
         }
 
 
@@ -325,11 +325,11 @@
         /// </summary>
         private void FollowPlayer()
         {
-            levelBuilder.FollowPlayer();
+            _levelBuilder.FollowPlayer();
 
-            if (mainCamera.transform.position.y < player.transform.position.y)
+            if (_mainCamera.transform.position.y < _player.transform.position.y)
             {
-                mainCamera.transform.position = new Vector3(0, player.transform.position.y, -10);
+                _mainCamera.transform.position = new Vector3(0, _player.transform.position.y, -10);
             }
         }
         #endregion
@@ -342,14 +342,14 @@
         /// </summary>
         private void LoadPlayer()
         {
-            playerStartPoz = new GameObject("PlayerStartPoz");
-            playerStartPoz.transform.SetParent(bottomLeftPoz);
-            playerStartPoz.transform.localPosition = new Vector3(1, 1.56f, 0);
+            _playerStartPoz = new GameObject("PlayerStartPoz");
+            _playerStartPoz.transform.SetParent(_bottomLeftPoz);
+            _playerStartPoz.transform.localPosition = new Vector3(1, 1.56f, 0);
 
-            player = Instantiate(Resources.Load<GameObject>("Level/Player"));
+            _player = Instantiate(Resources.Load<GameObject>("Level/Player"));
 
-            playerScript = player.GetComponent<Player>();
-            playerScript.ShowPlayer(false);
+            _playerScript = _player.GetComponent<Player>();
+            _playerScript.ShowPlayer(false);
         }
         #endregion
 
@@ -361,7 +361,7 @@
         /// </summary>
         private void ShowCorn()
         {
-            cornScript.ShowCorn(yPozObstacle.position.y);
+            _cornScript.ShowCorn(_yPozObstacle.position.y);
         }
 
 
@@ -370,11 +370,11 @@
         /// </summary>
         public void CornCollected()
         {
-            cornScript.HideCorn();
+            _cornScript.HideCorn();
             GameManager.instance.SoundLoader.AddFxSound("Collect");
-            playerScript.ShowBubble(true);
-            playerScript.EnableCollider(false);
-            player.GetComponent<Collider>().enabled = false;
+            _playerScript.ShowBubble(true);
+            _playerScript.EnableCollider(false);
+            _player.GetComponent<Collider>().enabled = false;
             StartCoroutine(CollectedAnimation());
         }
 
@@ -402,7 +402,7 @@
         private void EndSound()
         {
             GameManager.instance.SoundLoader.AddFxSound("CollectableAlert");
-            playerScript.ShowBubble(false);
+            _playerScript.ShowBubble(false);
         }
 
 
@@ -411,7 +411,7 @@
         /// </summary>
         private void DisableSpecialAbility()
         {
-            playerScript.EnableCollider(true);
+            _playerScript.EnableCollider(true);
         }
         #endregion
     }
