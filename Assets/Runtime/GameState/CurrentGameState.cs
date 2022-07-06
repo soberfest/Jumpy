@@ -8,8 +8,8 @@
     public class GameProgressManager
     {
         //The name of the filename for keeping the save game data
-        private const string fileName = "GameValues";
-        private SavedProperties savedProperties;
+        private const string FileName = "GameValues";
+        private SavedProperties _savedProperties;
 
         #region PublicMethods
         /// <summary>
@@ -17,7 +17,7 @@
         /// </summary>
         public void LoadGameStatus()
         {
-            SaveManager.Instance.Load<SavedProperties>(Application.persistentDataPath + "/" + fileName, LoadDone, false);
+            SaveManager.Instance.Load<SavedProperties>(Application.persistentDataPath + "/" + FileName, LoadDone, false);
         }
 
         /// <summary>
@@ -25,7 +25,7 @@
         /// </summary>
         public void SaveGameStatus()
         {
-            SaveManager.Instance.Save(savedProperties, Application.persistentDataPath + "/" + fileName, SaveComplete, false);
+            SaveManager.Instance.Save(_savedProperties, Application.persistentDataPath + "/" + FileName, SaveComplete, false);
         }
 
 
@@ -35,7 +35,7 @@
         /// <returns></returns>
         public int GetHighScore()
         {
-            return savedProperties.highScore;
+            return _savedProperties.highScore;
         }
 
 
@@ -46,12 +46,12 @@
         /// <returns>the current highScore</returns>
         public int SetHighScore(int score)
         {
-            if (score > savedProperties.highScore)
+            if (score > _savedProperties.highScore)
             {
-                savedProperties.highScore = score;
+                _savedProperties.highScore = score;
                 SaveGameStatus();
             }
-            return savedProperties.highScore;
+            return _savedProperties.highScore;
         }
 
 
@@ -60,14 +60,8 @@
         /// </summary>
         public float FXVolume
         {
-            get
-            {
-                return savedProperties.fxVolume;
-            }
-            set
-            {
-                savedProperties.fxVolume = value;
-            }
+            get => _savedProperties.fxVolume;
+            set => _savedProperties.fxVolume = value;
         }
 
 
@@ -76,15 +70,10 @@
         /// </summary>
         public float MusicVolume
         {
-            get
-            {
-                return savedProperties.musicVolume;
-            }
-            set
-            {
-                savedProperties.musicVolume = value;
-            }
+	        get => _savedProperties.musicVolume;
+	        set => _savedProperties.musicVolume = value;
         }
+
         #endregion
 
 
@@ -99,11 +88,11 @@
         {
             if (result == SaveResult.Success)
             {
-                savedProperties = data;
+                _savedProperties = data;
             }
             else
             {
-                savedProperties = new SavedProperties();
+                _savedProperties = new SavedProperties();
                 Debug.Log("Load failed " + message);
             }
         }
