@@ -9,24 +9,24 @@
     /// </summary>
     public class LevelBuilder : MonoBehaviour
     {
-	    private const float TopYPozChickens = 12f; //the top position of chicken background animation
-	    private const float WallObjectDimension = 1.4f; //the dimension of a wall object prefab
-	    private const float BgObjectDimension = 12.8f; //the dimension of a background image
+        private readonly float topYPozChickens = 12; //the top position of chicken background animation
+        private readonly float wallObjectDimension = 1.4f; //the dimension of a wall object prefab
+        private readonly float bgObjectDimension = 12.8f; //the dimension of a background image 
 
-	    private GameObject _firstWallObject;
-        private GameObject _firstBgObject;
-        private GameObject _chickens;
+        private GameObject firstWallObject;
+        private GameObject firstBgObject;
+        private GameObject chickens;
 
-        private Transform _bottomLeftPoz;
-        private Transform _bottomRightPoz;
-        private Transform _topLeftPoz;
-        private Transform _topRightPoz;
+        private Transform bottomLeftPoz;
+        private Transform bottomRightPoz;
+        private Transform topLeftPoz;
+        private Transform topRightPoz;
 
-        private Queue _rightWallObjects;
-        private Queue _leftWallObjects;
-        private Queue _bgObjects;
+        private Queue rightWallObjects;
+        private Queue leftWallObjects;
+        private Queue bgObjects;
 
-        private Camera _mainCamera;
+        private Camera mainCamera;
 
 
         #region PublicMethods
@@ -35,28 +35,29 @@
         /// </summary>
         public void ConstructLevel(Camera mainCamera)
         {
-            _mainCamera = mainCamera;
+            this.mainCamera = mainCamera;
             CreateScreenLimits();
 
             //add background and walls
-            var wallElement = Resources.Load<GameObject>("Level/SideGears");
-            var bg = Resources.Load<GameObject>("Level/Background");
-            var leftWall = new GameObject("LeftWall");
-            leftWall.transform.SetParent(_bottomLeftPoz, false);
-            var rightWall = new GameObject("RightWall");
-            rightWall.transform.SetParent(_bottomRightPoz, false);
+            GameObject wallElement = Resources.Load<GameObject>("Level/SideGears");
+            GameObject bg = Resources.Load<GameObject>("Level/Background");
+            GameObject leftWall = new GameObject("LeftWall");
+            leftWall.transform.SetParent(bottomLeftPoz, false);
+            GameObject rightWall = new GameObject("RightWall");
+            rightWall.transform.SetParent(bottomRightPoz, false);
             rightWall.transform.localScale = new Vector3(-1, 1, 1);
 
-            _leftWallObjects = new Queue(ConstructWall(leftWall, wallElement, WallObjectDimension, false));
-            _rightWallObjects = new Queue(ConstructWall(rightWall, wallElement, WallObjectDimension, false));
-            _bgObjects = new Queue(ConstructWall(gameObject, bg, BgObjectDimension, true));
+            leftWallObjects = new Queue(ConstructWall(leftWall, wallElement, wallObjectDimension, false));
+            rightWallObjects = new Queue(ConstructWall(rightWall, wallElement, wallObjectDimension, false));
+            bgObjects = new Queue(ConstructWall(gameObject, bg, bgObjectDimension, true));
 
-            _firstWallObject = _rightWallObjects.Dequeue() as GameObject;
-            _firstBgObject = _bgObjects.Dequeue() as GameObject;
+            firstWallObject = rightWallObjects.Dequeue() as GameObject;
+            firstBgObject = bgObjects.Dequeue() as GameObject;
 
             //add background animations
-            _chickens = Instantiate(Resources.Load<GameObject>("Level/BGChickens"), gameObject.transform, true);
-            _chickens.transform.position = new Vector3(0, TopYPozChickens, 0);
+            chickens = Instantiate(Resources.Load<GameObject>("Level/BGChickens"));
+            chickens.transform.SetParent(gameObject.transform);
+            chickens.transform.position = new Vector3(0, topYPozChickens, 0);
         }
 
 
@@ -65,22 +66,17 @@
         /// </summary>
         public void FollowPlayer()
         {
-	        if (_firstWallObject.transform.position.y <
-	            _mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, 0, -_mainCamera.transform.position.z)).y -
-	            WallObjectDimension / 2)
+            if (firstWallObject.transform.position.y < mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, 0, -mainCamera.transform.position.z)).y - wallObjectDimension / 2)
             {
                 UpdateWallQueue();
             }
 
-            if (_firstBgObject.transform.position.y <
-                _mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, 0, -_mainCamera.transform.position.z)).y -
-                BgObjectDimension * _firstBgObject.transform.localScale.x / 2)
+            if (firstBgObject.transform.position.y < mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, 0, -mainCamera.transform.position.z)).y - (bgObjectDimension * firstBgObject.transform.localScale.x) / 2)
             {
                 UpdateBgQueue();
             }
 
-            if (_chickens.transform.position.y < _mainCamera
-	                .ScreenToWorldPoint(new Vector3(Screen.width, 0, -_mainCamera.transform.position.z)).y - 1)
+            if (chickens.transform.position.y < mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, 0, -mainCamera.transform.position.z)).y - 1)
             {
                 UpdateChickens();
             }
@@ -93,7 +89,7 @@
         /// <returns></returns>
         public Transform GetBottomLeftPoz()
         {
-            return _bottomLeftPoz;
+            return bottomLeftPoz;
         }
 
 
@@ -103,7 +99,7 @@
         /// <returns></returns>
         public Transform GetBottomRightPoz()
         {
-            return _bottomRightPoz;
+            return bottomRightPoz;
         }
 
 
@@ -112,7 +108,7 @@
         /// </summary>
         public void ResetBG()
         {
-            _chickens.transform.position = new Vector3(0, TopYPozChickens, 0);
+            chickens.transform.position = new Vector3(0, topYPozChickens, 0);
             ResetWall();
             ResetBg();
         }
@@ -125,21 +121,21 @@
         /// </summary>
         private void CreateScreenLimits()
         {
-            _bottomLeftPoz = new GameObject("BottomLeft").transform;
-            _bottomLeftPoz.transform.SetParent(gameObject.transform);
-            Alignment.Align(_bottomLeftPoz, AlignPosition.BottomLeft, _mainCamera);
+            bottomLeftPoz = new GameObject("BottomLeft").transform;
+            bottomLeftPoz.transform.SetParent(gameObject.transform);
+            Alignment.Align(bottomLeftPoz, AlignPosition.BottomLeft, mainCamera);
 
-            _bottomRightPoz = new GameObject("BottomRight").transform;
-            _bottomRightPoz.transform.SetParent(gameObject.transform);
-            Alignment.Align(_bottomRightPoz, AlignPosition.BottomRight, _mainCamera);
+            bottomRightPoz = new GameObject("BottomRight").transform;
+            bottomRightPoz.transform.SetParent(gameObject.transform);
+            Alignment.Align(bottomRightPoz, AlignPosition.BottomRight, mainCamera);
 
-            _topLeftPoz = new GameObject("TopLeft").transform;
-            _topLeftPoz.transform.SetParent(gameObject.transform);
-            Alignment.Align(_topLeftPoz, AlignPosition.TopLeft, _mainCamera);
+            topLeftPoz = new GameObject("TopLeft").transform;
+            topLeftPoz.transform.SetParent(gameObject.transform);
+            Alignment.Align(topLeftPoz, AlignPosition.TopLeft, mainCamera);
 
-            _topRightPoz = new GameObject("TopRight").transform;
-            _topRightPoz.transform.SetParent(gameObject.transform);
-            Alignment.Align(_topRightPoz, AlignPosition.TopRight, _mainCamera);
+            topRightPoz = new GameObject("TopRight").transform;
+            topRightPoz.transform.SetParent(gameObject.transform);
+            Alignment.Align(topRightPoz, AlignPosition.TopRight, mainCamera);
         }
 
 
@@ -153,10 +149,10 @@
         /// <returns></returns>
         private List<GameObject> ConstructWall(GameObject holder, GameObject objToMultiply, float _objectDimension, bool scale)
         {
-            var objects = new List<GameObject>();
+            List<GameObject> objects = new List<GameObject>();
             float wallhight = 0;
             int nr = 0;
-            while (wallhight < (_topRightPoz.position.y + _objectDimension))
+            while (wallhight < (topRightPoz.position.y + _objectDimension))
             {
                 float scaleFactor = 1;
                 if (scale)
@@ -167,7 +163,8 @@
                         scaleFactor = 1;
                     }
                 }
-                var wall = Instantiate(objToMultiply, holder.transform, true);
+                GameObject wall = Instantiate(objToMultiply) as GameObject;
+                wall.transform.SetParent(holder.transform);
                 wall.transform.localPosition = new Vector3(0, nr * _objectDimension * scaleFactor, 0);
                 wall.transform.localScale = new Vector3(scaleFactor, scaleFactor, wall.transform.localScale.z);
                 objects.Add(wall);
@@ -185,17 +182,13 @@
         /// </summary>
         private void UpdateWallQueue()
         {
-	        var localPosition = _firstWallObject.transform.localPosition;
-	        localPosition = new Vector3(localPosition.x, localPosition.y + WallObjectDimension * (_rightWallObjects.Count + 1), localPosition.z);
-	        _firstWallObject.transform.localPosition = localPosition;
-	        _rightWallObjects.Enqueue(_firstWallObject);
-            _firstWallObject = _rightWallObjects.Dequeue() as GameObject;
+            firstWallObject.transform.localPosition = new Vector3(firstWallObject.transform.localPosition.x, firstWallObject.transform.localPosition.y + wallObjectDimension * (rightWallObjects.Count + 1), firstWallObject.transform.localPosition.z);
+            rightWallObjects.Enqueue(firstWallObject);
+            firstWallObject = rightWallObjects.Dequeue() as GameObject;
 
-            GameObject leftObject = _leftWallObjects.Dequeue() as GameObject;
-            var position = leftObject.transform.localPosition;
-            position = new Vector3(position.x, position.y + WallObjectDimension * (_leftWallObjects.Count + 1), position.z);
-            leftObject.transform.localPosition = position;
-            _leftWallObjects.Enqueue(leftObject);
+            GameObject leftObject = leftWallObjects.Dequeue() as GameObject;
+            leftObject.transform.localPosition = new Vector3(leftObject.transform.localPosition.x, leftObject.transform.localPosition.y + wallObjectDimension * (leftWallObjects.Count + 1), leftObject.transform.localPosition.z);
+            leftWallObjects.Enqueue(leftObject);
         }
 
 
@@ -204,11 +197,9 @@
         /// </summary>
         private void UpdateBgQueue()
         {
-	        var localPosition = _firstBgObject.transform.localPosition;
-	        localPosition = new Vector3(localPosition.x, localPosition.y + BgObjectDimension * (_bgObjects.Count + 1), localPosition.z);
-	        _firstBgObject.transform.localPosition = localPosition;
-	        _bgObjects.Enqueue(_firstBgObject);
-            _firstBgObject = _bgObjects.Dequeue() as GameObject;
+            firstBgObject.transform.localPosition = new Vector3(firstBgObject.transform.localPosition.x, firstBgObject.transform.localPosition.y + bgObjectDimension * (bgObjects.Count + 1), firstBgObject.transform.localPosition.z);
+            bgObjects.Enqueue(firstBgObject);
+            firstBgObject = bgObjects.Dequeue() as GameObject;
         }
 
 
@@ -217,10 +208,8 @@
         /// </summary>
         private void UpdateChickens()
         {
-	        var position = _chickens.transform.position;
-	        position = new Vector3(position.x, position.y + 20, position.z);
-	        _chickens.transform.position = position;
-	        _chickens.transform.localScale = new Vector3(_chickens.transform.localScale.x * -1, 1, 1);
+            chickens.transform.position = new Vector3(chickens.transform.position.x, chickens.transform.position.y + 20, chickens.transform.position.z);
+            chickens.transform.localScale = new Vector3(chickens.transform.localScale.x * -1, 1, 1);
         }
         #endregion
 
@@ -231,19 +220,15 @@
         /// </summary>
         private void ResetWall()
         {
-            for (int i = 0; i <= _rightWallObjects.Count; i++)
+            for (int i = 0; i <= rightWallObjects.Count; i++)
             {
-	            var localPosition = _firstWallObject.transform.localPosition;
-	            localPosition = new Vector3(localPosition.x, WallObjectDimension * i, localPosition.z);
-	            _firstWallObject.transform.localPosition = localPosition;
-	            _rightWallObjects.Enqueue(_firstWallObject);
-                _firstWallObject = _rightWallObjects.Dequeue() as GameObject;
+                firstWallObject.transform.localPosition = new Vector3(firstWallObject.transform.localPosition.x, wallObjectDimension * i, firstWallObject.transform.localPosition.z);
+                rightWallObjects.Enqueue(firstWallObject);
+                firstWallObject = rightWallObjects.Dequeue() as GameObject;
 
-                GameObject leftObject = _leftWallObjects.Dequeue() as GameObject;
-                var position = leftObject.transform.localPosition;
-                position = new Vector3(position.x, WallObjectDimension * i, position.z);
-                leftObject.transform.localPosition = position;
-                _leftWallObjects.Enqueue(leftObject);
+                GameObject leftObject = leftWallObjects.Dequeue() as GameObject;
+                leftObject.transform.localPosition = new Vector3(leftObject.transform.localPosition.x, wallObjectDimension * i, leftObject.transform.localPosition.z);
+                leftWallObjects.Enqueue(leftObject);
             }
         }
 
@@ -253,13 +238,11 @@
         /// </summary>
         private void ResetBg()
         {
-            for (int i = 0; i <= _bgObjects.Count; i++)
+            for (int i = 0; i <= bgObjects.Count; i++)
             {
-	            var localPosition = _firstBgObject.transform.localPosition;
-	            localPosition = new Vector3(localPosition.x, BgObjectDimension * i, localPosition.z);
-	            _firstBgObject.transform.localPosition = localPosition;
-	            _bgObjects.Enqueue(_firstBgObject);
-                _firstBgObject = _bgObjects.Dequeue() as GameObject;
+                firstBgObject.transform.localPosition = new Vector3(firstBgObject.transform.localPosition.x, bgObjectDimension * i, firstBgObject.transform.localPosition.z);
+                bgObjects.Enqueue(firstBgObject);
+                firstBgObject = bgObjects.Dequeue() as GameObject;
             }
         }
         #endregion

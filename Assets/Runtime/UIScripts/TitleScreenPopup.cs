@@ -27,7 +27,14 @@
 #if !UNITY_IOS
             restoreButton.SetActive(false);
 #endif
-	        UpdateButtons();
+#if ENABLE_JUMPY
+            /*
+            playText.text = GleyLocalization.Manager.GetText(WordIDs.PlayID);
+            playText.text = GleyLocalization.Manager.GetText(WordIDs.PlayID);
+            playText.text = GleyLocalization.Manager.GetText(WordIDs.PlayID);
+            */
+#endif
+            UpdateButtons();
         }
 
 
@@ -60,8 +67,31 @@
                 }
                 UpdateButtons();
             }
+
+            //if (button.name == "RestorePurchases")
+            //{
+                // DisablePopup();
+                // IAPManager.Instance.RestorePurchases(PurchasesRestored);
+            //}
         }
 
+        
+        /*private void PurchasesRestored(IAPOperationStatus status, string message, StoreProduct product)
+        {
+#if ENABLE_JUMPY
+            if (status == IAPOperationStatus.Success)
+            {
+                if (product.productName == ShopProductNames.RemoveAds.ToString())
+                {
+                    if (product.active == true)
+                    {
+                        Advertisements.Instance.RemoveAds(true);
+                    }
+                }
+            }
+#endif
+            EnablePopup();
+        }*/
 
 
         // ReSharper disable Unity.PerformanceAnalysis

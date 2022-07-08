@@ -8,6 +8,6 @@
     {
         public float musicVolume = 1;
         public float fxVolume = 1;
-        public int highScore;
+        public int highScore = 0;
     }
 }
